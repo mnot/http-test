@@ -1,21 +1,9 @@
 
-<table>
-
+{{#test_session}}
 <tr>
-   <td>id</td>
+   <td>{{ua}}</td>
    {{#tests}}
-      <td>{{short_name}}</td>
+      <td>{{#pass}}+{{/pass}}</td>
    {{/tests}}
 </tr>
-
-{{#test_plans}}
-<tr>
-   <td>{{id}}</td>
-   {{#test_sessions}}
-      <td></td>
-   {{/test_sessions}}
-</tr>
-{{/test_plans}}
-{{#test_sessions}}
-
-</table>
+{{/test_session}}

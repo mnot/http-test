@@ -1,8 +1,8 @@
 this.tests = [
     {
         'id': 'cc_ma',
-        'res_hdrs': {'Cache-Control': 'max-age=15'},
-        'fresh_for': 15
+        'res_hdrs': {'Cache-Control': 'max-age=10'},
+        'fresh_for': 10
     },
     {
         'id': 'cc_nc',

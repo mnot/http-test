@@ -95,25 +95,26 @@ function test_page(request, response, path_segs, session_state) {
         // invalid TID
         return not_found(response);
     }
-    if (! session_state[tid]) {
+    if (! session_state.tests[tid]) {
         // newly started test
-        session_state[tid] = {
+        session_state.tests[tid] = {
             'start': new Date(),
             'bugs': [],
             'reqs': [],
             'testing': true,
-            'duration': test_plans[tid].fresh_for + tolerance
+            'duration': test_plans[tid].fresh_for + tolerance, 
+            'pass': false
         };
         // update the test state with the test plan
         for (attr in test_plans[tid]) {
-            session_state[tid][attr] = test_plans[tid][attr];
+            session_state.tests[tid][attr] = test_plans[tid][attr];
         }
         // set a timeout for the test period.
-        session_state[tid].timeout = setTimeout(function () {
-                session_state[tid].testing = false;
-            }, (session_state[tid].duration) * 1000);
+        session_state.tests[tid].timeout = setTimeout(function () {
+                session_state.tests[tid].testing = false;
+            }, (session_state.tests[tid].duration) * 1000);
     }
-    var test_state = session_state[tid];    
+    var test_state = session_state.tests[tid];    
     var asset = path_segs.shift();
     switch (asset) {
         case "bug":
@@ -133,10 +134,15 @@ function test_page(request, response, path_segs, session_state) {
               response.writeHead(400, {'Content-Type': 'text/html'});
               return render('noreload.html', {}, response)
             }
-            /* test HTML */
+
             test_state.reqs.push({
                 'time': ( new Date() - test_state.start ) / 1000
             });
+            if (! test_state.testing) {
+                // done; figure out the results.
+                test_state.pass = true;
+            }
+
             var res_hdrs = {
                 'Content-Type': "text/html",
                 'Cache-Control': "private"
@@ -154,9 +160,9 @@ function test_page(request, response, path_segs, session_state) {
                 'num_tests': test_plans.length,
                 'show_next_test': tid + 1 < test_plans.length,
                 'req_num': test_state.reqs.length,
+                'test_plans': test_plans,
+                'test_session': session_state
             }, response);
-            if (! test_state.testing) {
-            }
             break;
         default:
             not_found(response);
@@ -209,6 +215,15 @@ function render(template, ctx, response) {
     });    
 }
 
+function session_list(s) {
+    var l = [];
+    for (k in s) {
+        console.log(sys.inspect(s[k]));
+        l.push(s[k]);
+    }
+    return l;
+}
+
 /* 
 Generate a unique identifier for this session, so that we can 
 test a single browser. 
@@ -217,8 +232,8 @@ function gen_id(request) {
     var id = Math.random();
     var session_state = {
         'ua': request.headers['user-agent'],
-        'id': id,
-        'results': {}
+        'client_id': id,
+        'tests': {}
     };
     state[id] = session_state;
     return id;
