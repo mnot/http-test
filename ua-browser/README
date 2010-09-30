@@ -1,0 +1,89 @@
+
+For each test (* is XHR only):
+  - A HREF to HTML
+  - IFRAME to HTML
+  - IMG tag to jpeg
+  - META tag to css
+  - @import to css
+  - SCRIPT tag to js
+  - XHR to app/octet
+
+
+A. Setup
+
+0. can auto-nav
+1. Caches Expires: [future]
+2. Caches Expires: [future] + CC: private
+
+B. Conformance
+
+I. int fresh_for(response)
+  1. Doesn't cache Expires: [past]
+  2. Doesn't cache Expires: [invalid]
+  3. Doesn't cache Cache-Control: max-age=0
+  4. Doesn't cache Cache-Control: max-age=n + wait(n+m)
+  5. Doesn't cache Cache-Control: max-age=n + Age: (n+m)
+  6. Doesn't cache Cache-Control: no-cache
+  7. Doesn't cache Cache-Control: no-store
+  8. Doesn't cache Expires: [future] + Cache-Control: max-age=[past]
+  9. Doesn't cache FOO method responses
+  10. Doesn't cache 899 status codes
+  11. Doesn't cache nominated status codes without explicit freshness
+  12. Doesn't cache PUT requests/responses
+  13. Doesn't cache DELETE requests/responses
+  14. Doesn't cache Vary: *
+
+II. invalidates(res1, res2)
+15. Doesn't cache Vary: cookie with different cookie
+16. Invalidates request-URI on POST / PUT / DELETE
+17. Invalidates content-location on POST / PUT / DELETE
+18. Invalidates location on POST / PUT / DELETE
+19. Invalidates request-URI on FOO
+
+III.
+20. Doesn't cache on request Cache-Control: no-cache
+21. Doesn't cache on request Cache-Control: no-store
+22. Doesn't cache on request Cache-Control: max-age=n w/ age > n
+23. Doesn't cache on request Cache-Control: max-stale...
+24. 504s on Cache-Control: only-if-cached when not in cache
+
+C. Functionality
+
+1. Caches Expires: [future]
+2. Caches Cache-Control: max=age=n
+3. Caches Cache-Control: max-age=n + wait (n-m)
+4. Caches Cache-Control: max-age=n + Age: (n-m)
+5. Caches Expires: [past] + Cache-Control: max-age=[future]
+6. Caches URI with query string + explicit freshness
+7. Caches nominated status codes without explicit freshness
+8. Caches authenticated responses
+9. Caches POST responses for future GETs
+10. Caches PATCH responses
+11. Caches Vary: Accept-Encoding
+12. Caches Vary: User-Agent
+13. Caches Vary: Host
+14. Caches Vary: cookie with same cookie
+15. *Caches on request Cache-Control: max-age=n w/ age <= n
+16. *Caches on request Cache-Control: max-stale...
+17. *Caches partial response
+18. *Combines partial response from cache
+
+TODO
+ - header nomination and private, no-cache
+ - validation
+ - clockless origin server
+ - detailed age calculation
+ - stale responses (+ must-revalidate)
+ - malformed age, cache-control, date
+
+D. API
+
+function fresh_for(res) {
+	res.headers.add("Cache-Control: max-age=12");
+	return 12;
+}
+
+function invalidates(res1, req2, res2) {
+	res1.headers.add("Vary: cookie");
+	res1.headers.add("Set-Cookie: foo=bar");
+		
