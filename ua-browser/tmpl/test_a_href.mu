@@ -1,6 +1,7 @@
+{{#s}}
 <html>
 <head>
-   <title>Test {{test_num}} of {{test_ttl}}: {{id}}</title>
+   <title>Test {{test_num}} of {{num_tests}}: {{id}}</title>   
 </head>
 <body>
 <h1>This is the A HREF test.</h1>
@@ -75,3 +76,4 @@
 
 </body>
 </html>
+{{/s}}

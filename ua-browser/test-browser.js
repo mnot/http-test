@@ -149,17 +149,11 @@ function test_page(request, response, path_segs, session_state) {
             }
             response.writeHead(200, res_hdrs);
             render('test_a_href', {
-                'id': test_state.id,
-                'desc': test_state.desc,
-                'fresh_for': test_state.fresh_for,
+                's': test_state,
                 'test_num': tid + 1,
-                'test_ttl': test_plans.length,
+                'num_tests': test_plans.length,
                 'show_next_test': tid + 1 < test_plans.length,
-                'bugs': test_state.bugs,
-                'reqs': test_state.reqs,
                 'req_num': test_state.reqs.length,
-                'testing': test_state.testing,
-                'duration': test_state.duration
             }, response);
             if (! test_state.testing) {
             }
