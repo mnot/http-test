@@ -1,7 +1,7 @@
 
 {{#test_session}}
 <tr>
-   <td>{{ua}}</td>
+   <td>{{client_id}}</td>
    {{#tests}}
       <td>{{#pass}}+{{/pass}}</td>
    {{/tests}}

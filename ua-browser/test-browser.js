@@ -36,6 +36,16 @@ var state = {};
 
 
 http.createServer(function (request, response) {
+  request.input_buffer = "";
+  request.on('data', function(chunk) {
+    request.input_buffer += chunk;
+  });
+  request.on('end', function() {
+    req_done(request, response);
+  });
+}).listen(port);  
+  
+function req_done(request, response) {
     var path = url.parse(request.url).pathname;
     var path_segs = path.split("/");
     path_segs.shift();
@@ -64,7 +74,7 @@ http.createServer(function (request, response) {
             not_found(response);
             break;
   }
-}).listen(port);
+};
 
 /* Show the welcome page. */
 function intro_page(request, response) {
@@ -230,9 +240,10 @@ test a single browser.
 */
 function gen_id(request) {
     var id = Math.random();
+    var short_name = qs.parse(request.input_buffer)['short_name'];
     var session_state = {
         'ua': request.headers['user-agent'],
-        'client_id': id,
+        'client_id': short_name || ua,
         'tests': {}
     };
     state[id] = session_state;
