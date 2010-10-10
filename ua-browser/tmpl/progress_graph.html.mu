@@ -12,6 +12,10 @@
   var fresh_x = start + ( ({{fresh_for}} / duration) * (end - start) )
   var bugs = [{{#bugs}}{{time}}, {{/bugs}}];
   var reqs = [{{#reqs}}{{time}}, {{/reqs}}];
+  var imgs = [{{#img_reqs}}{{time}}, {{/img_reqs}}];
+  var scripts = [{{#script_reqs}}{{time}}, {{/script_reqs}}];
+  var csses = [{{#css_reqs}}{{time}}, {{/css_reqs}}];
+  var iframes = [{{#iframe_reqs}}{{time}}, {{/iframe_reqs}}];
   var paper = Raphael(document.getElementById("paper"), w, h);
   paper.path("M" + start + " " + y + " L " + end + " " + y + " z")
        .attr({"stroke": "#AAA"});
@@ -27,19 +31,28 @@
      'fill': "#aaa"
   });
   paper.text(fresh_x, y - 20, "{{fresh_for}}s");
+  
+  // paint bugs
   for (b in bugs) {
      var bug = bugs[b];
      var x = start + ( (bug / duration) * (end - start) );
      paper.circle(x, y-2, 3).attr({"fill": "#448", "stroke": "none"});
   }
-  for (r in reqs) {
-     var req = reqs[r];
-     var x = start + ( (req / duration) * (end - start) );
-     if (r == 0) {
-        var colour = "#484";
-     } else {
-        var colour = "#844";
+  
+  function paint_reqs(reqs, y_offset, shape, size, attrs) {
+     for (r in reqs) {
+        var req = reqs[r];
+        var x = start + ( (req / duration) * (end - start) );
+        paper[shape](x, y+y_offset, size).attr(attrs);
      }
-     paper.circle(x, y+3, 5).attr({"fill": colour, "stroke": "none"});
   }
+
+  var first_req = reqs.shift();
+  paint_reqs([first_req], 3, 'circle', 5, {"fill": "#484", "stroke": "none"});
+  paint_reqs(reqs, 3, 'circle', 5, {"fill": "#844", "stroke": "none"});
+  paint_reqs(imgs, 9, 'circle', 4, {"fill": "#884", "stroke": "none"});
+  paint_reqs(scripts, 14, 'circle', 4, {"fill": "#884", "stroke": "none"});
+  paint_reqs(csses, 19, 'circle', 4, {"fill": "#884", "stroke": "none"});
+  paint_reqs(iframes, 24, 'circle', 4, {"fill": "#884", "stroke": "none"});
+  
 </script>
