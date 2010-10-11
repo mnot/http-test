@@ -90,10 +90,66 @@ this.tests = [
     'fresh_for': 0
   },
   {
+    'id': 'vary_host',
+    'desc': 'Vary: Host', 
+    'status': 200,
+    'res_hdrs': {'Vary': 'Host', 'Cache-Control': 'max-age=10'},
+    'fresh_for': 10
+  },
+  {
+    'id': 'vary_ua',
+    'desc': 'Vary: User-Agent', 
+    'status': 200,
+    'res_hdrs': {'Vary': 'User-Agent', 'Cache-Control': 'max-age=10'},
+    'fresh_for': 10
+  },
+  {
+    'id': 'vary_ae',
+    'desc': 'Vary: Accept-Encoding', 
+    'status': 200,
+    'res_hdrs': {'Vary': 'Accept-Encoding', 'Cache-Control': 'max-age=10'},
+    'fresh_for': 10
+  },
+  {
     'id': 'unk_status',
     'desc': 'Unknown Status Code', 
-    'status': ['250', 'Whatever'],
+    'status': 250,
     'res_hdrs': {'Cache-Control': 'max-age=10'},
+    'fresh_for': 0
+  },
+  {
+    'id': '404_none',
+    'desc': '404 Status Code w/o Freshness', 
+    'status': 404,
+    'res_hdrs': {},
+    'fresh_for': 0
+  },
+  {
+    'id': '404_cc',
+    'desc': '404 Status Code w/ Freshness', 
+    'status': 404,
+    'res_hdrs': {'Cache-Control': 'max-age=10'},
+    'fresh_for': 10
+  },
+  {
+    'id': '403_none',
+    'desc': '403 Status Code w/o Freshness', 
+    'status': 403,
+    'res_hdrs': {},
+    'fresh_for': 0
+  },
+  {
+    'id': '403_cc',
+    'desc': '403 Status Code w/ Freshness', 
+    'status': 403,
+    'res_hdrs': {'Cache-Control': 'max-age=10'},
+    'fresh_for': 10
+  },
+  {
+    'id': 'pre_post',
+    'desc': 'Cache-Control: max-age=0, pre-check=0, post-check=0', 
+    'status': 200,
+    'res_hdrs': {'Cache-Control': 'max-age-0, pre-check=0, post-check=0'},
     'fresh_for': 0
   },
   /*
@@ -134,8 +190,8 @@ this.interpret = function(test) {
     var result = true;
     if (bug_count > 0) {
       result = false;
-      console.log("*" + test.fresh_for + " " + second_req + " ");
-      console.log(test.bugs);
+//      console.log("*" + test.fresh_for + " " + second_req + " ");
+//      console.log(test.bugs);
     }
     results[asset_types[i]] = result;
   };
