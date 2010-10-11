@@ -1,15 +1,13 @@
 {{#s}}
 <html>
 <head>
-   <title>Test {{test_num}} of {{num_tests}}: {{id}}</title> 
+   <title>Test {{test_num}} of {{num_tests}}: {{desc}}</title> 
    {{#testing}}  
    <link rel="STYLESHEET" type="text/css" href="css">
    {{/testing}}
 </head>
 <body>
-<h1>{{desc}}</h1>
-
-<p>request {{req_num}}.</p>
+<h1>Test {{test_num}} of {{num_tests}}: {{desc}}</h1>
 
 <p>
 {{#testing}}

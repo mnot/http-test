@@ -20,7 +20,7 @@
   paper.path("M" + start + " " + y + " L " + end + " " + y + " z")
        .attr({"stroke": "#AAA"});
   paper.path("M" + fresh_x + " " + (y - 10) + " " +
-             "L" + fresh_x + " " + (y + 10) + ' z' 
+             "L" + fresh_x + " " + (y + 60) + ' z' 
   );
   paper.text(w/2, y-70, "client requests").attr({
      'font-size': 14,
@@ -39,20 +39,18 @@
      paper.circle(x, y-5, 3).attr({"fill": "#000", "stroke": "none"});
   }
   
-  function paint_reqs(reqs, y_offset, shape, size, attrs) {
+  function paint_reqs(reqs, y_offset, size, attrs) {
      for (r in reqs) {
         var req = reqs[r];
         var x = start + ( (req / duration) * (end - start) );
-        paper[shape](x, y+y_offset, size).attr(attrs);
+        paper.circle(x, y+y_offset, size).attr(attrs);
      }
   }
 
-  var first_req = reqs.shift();
-  paint_reqs([first_req], 3, 'circle', 5, {"fill": "#484", "stroke": "none"});
-  paint_reqs(reqs, 10, 'circle', 5, {"fill": "#844", "stroke": "none"});
-  paint_reqs(imgs, 20, 'circle', 4, {"fill": "#884", "stroke": "none"});
-  paint_reqs(scripts, 30, 'circle', 4, {"fill": "#884", "stroke": "none"});
-  paint_reqs(csses, 40, 'circle', 4, {"fill": "#448", "stroke": "none"});
-  paint_reqs(iframes, 50, 'circle', 4, {"fill": "#884", "stroke": "none"});
+  paint_reqs(reqs, 8, 5, {"fill": "#844", "stroke": "none"});
+  paint_reqs(imgs, 18, 4, {"fill": "#884", "stroke": "none"});
+  paint_reqs(scripts, 28, 4, {"fill": "#484", "stroke": "none"});
+  paint_reqs(csses, 38, 4, {"fill": "#448", "stroke": "none"});
+  paint_reqs(iframes, 48, 4, {"fill": "#848", "stroke": "none"});
   
 </script>
