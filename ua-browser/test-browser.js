@@ -8,7 +8,7 @@ var sys = require('sys');
 var url = require("url");
 
 var argv = require('./lib/optimist').argv;
-var Mu = require('./lib/mu');
+var Mu = require('./lib/Mu');
 
 // how long to continue testing for.
 var tolerance = 2;
