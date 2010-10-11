@@ -7,7 +7,7 @@
    {{/testing}}
 </head>
 <body>
-<h1>This is the A HREF test.</h1>
+<h1>{{desc}}</h1>
 
 <p>request {{req_num}}.</p>
 
@@ -17,23 +17,13 @@
 {{/testing}}
 {{^testing}}
   All done.
+  {{#show_next_test}}
+    <a href="../{{test_num}}/page">Ready for the next one</a>?
+  {{/show_next_test}}
 {{/testing}}
 </p>
 
-{{#testing}}
-<img src="img" width="1" height="1" border="1">
-<script src="script" language="text/javascript"></script>
-<iframe src="iframe"></iframe>
-{{/testing}}
-
-<img src="bug" width="0" height="0">
-
 {{> progress_graph.html}}
-
-{{^testing}}
-{{#show_next_test}}
-<p>Ready for the <a href="../{{test_num}}/page">next one</a>?
-{{/show_next_test}}
 
 {{^show_next_test}}
 <table>
@@ -42,9 +32,12 @@
 </table>  
 {{/show_next_test}}
 
+{{#testing}}
+<img src="img" width="1" height="1" border="1">
+<script src="script" type="text/javascript"></script>
+<iframe src="iframe" width="1" height="1"></iframe>
+<img src="bug" width="0" height="0">
 {{/testing}}
-
-
 
 </body>
 </html>

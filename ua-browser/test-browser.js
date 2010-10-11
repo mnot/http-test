@@ -205,7 +205,6 @@ function test_asset(request, response, test_state, asset) {
   test_state[asset.name + '_reqs'].push({
     'time': ( new Date() - test_state.start ) / 1000
   });
-  console.log("asset: " + asset.name + " for " + test_state.test_id);
   var res_hdrs = {
     'Content-Type': asset.type,
     'Cache-Control': "private"
