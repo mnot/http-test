@@ -13,8 +13,8 @@ var tolerance = 2;
 // port to listen to 
 var port = parseInt(process.argv.pop());
 if (! port || port == NaN) {
-    console.log("Usage: " + process.argv[0] + " listen-port");
-    process.exit(1);
+  console.log("Usage: " + process.argv[0] + " listen-port");
+  process.exit(1);
 }
 
 // load templates
@@ -22,8 +22,8 @@ Mu.templateRoot = './tmpl';
 
 // load static assets
 var static = {
-    'raphael': fs.readFileSync('lib/raphael-min.js'),
-    '1x1': fs.readFileSync('lib/1x1.png')
+  'raphael': fs.readFileSync('lib/raphael-min.js'),
+  '1x1': fs.readFileSync('lib/1x1.png')
 }
 
 // load asset objects
@@ -33,6 +33,7 @@ var assets = a.assets;
 // the list of test plans 
 var t = require('./tests/cache');
 var test_plans = t.tests;
+var interpret = t.interpret;
 console.log("loading " + test_plans.length + " test plans...");
 
 // where ALL test state is stored.
@@ -102,8 +103,17 @@ function test_req(request, response, path_segs, session_state) {
   // TODO: don't let a finished test be re-run.
   var tid = path_segs.shift();
   if (tid == "") {
-    /* Start testing. */
-    return see_other(response, './0/page');
+    if (! session_state.tests[0]) {
+      // Start testing.
+      return see_other(response, './0/page');      
+    } else {
+      // show results
+      response.writeHead(200, {'Content-Type': 'text/html'});
+      return render('single_results.html', {
+        'session_state': session_state,
+        'test_plans': test_plans
+        }, response);
+    }
   }
   tid = parseInt(tid);
   if (tid == NaN || tid > test_plans.length - 1) {
@@ -116,14 +126,14 @@ function test_req(request, response, path_segs, session_state) {
       'test_id': tid,
       'start': new Date(),
       'bugs': [],
-      'reqs': [],
+      'html_reqs': [],
       'img_reqs': [],
       'script_reqs': [],
       'css_reqs': [],
       'iframe_reqs': [],
       'testing': true,
       'duration': test_plans[tid].fresh_for + tolerance, 
-      'pass': false
+      'results': undefined
     };
     // update the test state with the test plan
     for (attr in test_plans[tid]) {
@@ -154,27 +164,29 @@ function test_req(request, response, path_segs, session_state) {
         return render('noreload.html', {}, response)
       }
 
-      test_state.reqs.push({
+      test_state.html_reqs.push({
         'time': ( new Date() - test_state.start ) / 1000
       });
+      
+      if (! test_state.testing) {
+        test_state.results = interpret(test_state);
+      }
 
       var res_hdrs = {
         'Content-Type': "text/html",
         'Cache-Control': "private"
       }
-      if (test_state.reqs.length == 1) {
-        // add in test plan's headers on first response only.
-        for (attr in test_state.res_hdrs) {
-          res_hdrs[attr] = test_state.res_hdrs[attr];
-        };
-      }
-      response.writeHead(200, res_hdrs);
+      if (test_state.html_reqs.length == 1) {
+        response.writeHead(200, prep_hdrs(res_hdrs, test_state.res_hdrs));
+      } else {
+        response.writeHead(200, res_hdrs);
+      };
       render('test_a_href', {
         's': test_state,
         'test_num': tid + 1,
         'num_tests': test_plans.length,
-        'show_next_test': tid + 1 < test_plans.length,
-        'req_num': test_state.reqs.length,
+        'tests_complete': tid + 1 >= test_plans.length,
+        'req_num': test_state.html_reqs.length,
         'test_plans': test_plans,
         'test_session': session_state
       }, response);
@@ -209,12 +221,26 @@ function test_asset(request, response, test_state, asset) {
     'Content-Type': asset.type,
     'Cache-Control': "private"
   };
-  for (attr in test_state.res_hdrs) {
-    res_hdrs[attr] = test_state.res_hdrs[attr];
-  };
-  response.writeHead(200, res_hdrs);
+  response.writeHead(200, prep_hdrs(res_hdrs, test_state.res_hdrs));
   response.end(asset.content);
 }
+
+// prepare test headers
+function prep_hdrs(default_hdrs, test_hdrs) {
+  var res_hdrs = {};
+  var now = new Date();
+  for (attr in default_hdrs) {
+    res_hdrs[attr] = default_hdrs[attr];
+  };  
+  for (attr in test_hdrs) {
+    if (typeof test_hdrs[attr] == 'function') {
+      res_hdrs[attr] = test_hdrs[attr](now);
+    } else {
+      res_hdrs[attr] = test_hdrs[attr];
+    };
+  };
+  return res_hdrs;
+};
 
 // serve the monitoring bug and record it to test_state
 function bug(request, response, test_state) {
@@ -280,7 +306,7 @@ function gen_id(request) {
   var session_state = {
     'ua': request.headers['user-agent'],
     'client_id': short_name || id,
-    'tests': {}
+    'tests': []
   };
   state[id] = session_state;
   return id;

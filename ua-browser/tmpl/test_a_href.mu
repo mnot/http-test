@@ -2,9 +2,11 @@
 <html>
 <head>
    <title>Test {{test_num}} of {{num_tests}}: {{desc}}</title> 
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
    {{#testing}}  
    <link rel="STYLESHEET" type="text/css" href="css">
    {{/testing}}
+   {{> css.html}}
 </head>
 <body>
 <h1>Test {{test_num}} of {{num_tests}}: {{desc}}</h1>
@@ -14,21 +16,17 @@
   <a href="page">click me about once a second...</a>
 {{/testing}}
 {{^testing}}
-  All done.
-  {{#show_next_test}}
+   All done.
+   {{^tests_complete}}
     <a href="../{{test_num}}/page">Ready for the next one</a>?
-  {{/show_next_test}}
+   {{/tests_complete}}
+   {{#tests_complete}}
+    <a href="../">Show results</a>.
+   {{/tests_complete}}
 {{/testing}}
 </p>
 
 {{> progress_graph.html}}
-
-{{^show_next_test}}
-<table>
-  {{> result_hdr.html}}
-  {{> results.html}}
-</table>  
-{{/show_next_test}}
 
 {{#testing}}
 <img src="img" width="1" height="1" border="1">
