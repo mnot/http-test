@@ -32,7 +32,26 @@
 <img src="img" width="1" height="1" border="1">
 <script src="script" type="text/javascript"></script>
 <iframe src="iframe" width="1" height="1"></iframe>
-<img src="bug" width="0" height="0">
+<script type="text/javascript">
+window.onload = function() {
+   var req;
+   if (window.XMLHttpRequest) {
+      try {
+        req = new XMLHttpRequest();
+      } catch(e) {
+        req = false;
+      }
+   } else if (window.ActiveXObject) {
+      try {
+        req = new ActiveXObject("Microsoft.XMLHTTP");
+      } catch(e) {
+        req = false;
+      }
+   }
+   req.open("GET", "bug", false);
+   req.send("");
+}
+</script>
 {{/testing}}
 
 </body>

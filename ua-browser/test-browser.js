@@ -63,7 +63,7 @@ function req_done(request, response) {
       var cid = path_segs.shift();
       var session_state = state[cid];
       if (! session_state) {
-        not_found(response);
+        not_found(request, response);
       } else {
         test_req(request, response, path_segs, session_state);
       }
@@ -76,7 +76,7 @@ function req_done(request, response) {
       response.end(static['raphael']);
       break;
     default:
-      not_found(response);
+      not_found(request, response);
       break;
   }
 };
@@ -118,7 +118,7 @@ function test_req(request, response, path_segs, session_state) {
   tid = parseInt(tid);
   if (tid == NaN || tid > test_plans.length - 1) {
     // invalid TID
-    return not_found(response);
+    return not_found(request, response);
   }
   if (! session_state.tests[tid]) {
     // newly started test
@@ -177,7 +177,10 @@ function test_req(request, response, path_segs, session_state) {
         'Cache-Control': "private"
       }
       if (test_state.html_reqs.length == 1) {
-        response.writeHead(200, prep_hdrs(res_hdrs, test_state.res_hdrs));
+        response.writeHead(
+          test_state.status, 
+          prep_hdrs(res_hdrs, test_state.res_hdrs)
+        );
       } else {
         response.writeHead(200, res_hdrs);
       };
@@ -204,7 +207,7 @@ function test_req(request, response, path_segs, session_state) {
       test_asset(request, response, test_state, assets.iframe);
       break;
     default:
-      not_found(response);
+      not_found(request, response);
       break;
   }
 }
@@ -221,7 +224,10 @@ function test_asset(request, response, test_state, asset) {
     'Content-Type': asset.type,
     'Cache-Control': "private"
   };
-  response.writeHead(200, prep_hdrs(res_hdrs, test_state.res_hdrs));
+  response.writeHead(
+    test_state.status, 
+    prep_hdrs(res_hdrs, test_state.res_hdrs)
+  );
   response.end(asset.content);
 }
 
@@ -264,8 +270,9 @@ function see_other(response, location) {
 }
 
 // return a 404 Not Found
-function not_found(response) {
+function not_found(request, response) {
   response.writeHead(404, {'Content-Type': 'text/html'});
+  console.log("* Not found: " + request.url)
   render('notfound.html', {}, response)
 }
 
@@ -290,7 +297,6 @@ function render(template, ctx, response) {
 function session_list(s) {
   var l = [];
   for (k in s) {
-    console.log(sys.inspect(s[k]));
     l.push(s[k]);
   }
   return l;

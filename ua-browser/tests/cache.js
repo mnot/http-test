@@ -10,35 +10,35 @@ this.tests = [
   {
     'id': 'expires_past',
     'desc': 'Expires in the past', 
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {'Expires': minusTen},
     'fresh_for': 0
   },
   {
     'id': 'expires_future',
     'desc': 'Expires in the future', 
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {'Expires': plusTen},
     'fresh_for': 10
   },
   {
     'id': 'expires_invalid',
     'desc': 'Invalid Expires header',
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {'Expires': 'foo'},
     'fresh_for': 0
   },
   {
     'id': 'cc_ma',
     'desc': 'Cache-Control: max-age=10',
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {'Cache-Control': 'max-age=10'},
     'fresh_for': 10
   },
   {
     'id': 'age',
     'desc': 'Cache-Control: max-age=10 + Age: 5',
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {
       'Cache-Control': 'max-age=10',
       'Age': '5'
@@ -47,8 +47,8 @@ this.tests = [
   },
   {
     'id': 'old_date',
-    'desc': 'Cache-Control: max-age=10 + Old Date', 
-    'status': ['200', 'OK'],
+    'desc': 'Cache-Control: max-age=5 + Old Date', 
+    'status': 200,
     'res_hdrs': {
       'Cache-Control': 'max-age=5',
       'Date': minusTen
@@ -58,34 +58,34 @@ this.tests = [
   {
     'id': 'cc_nc',
     'desc': 'Cache-Control: no-cache',
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {'Cache-Control': 'no-cache'},
     'fresh_for': 0
   },
   {
     'id': 'cc_ns',
     'desc': 'Cache-Control: no-store',
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {'Cache-Control': 'no-store'},
     'fresh_for': 0
   },
   {
     'id': 'cc_precedence',
     'desc': 'Cache-Control: max-age precedence over Expires', 
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {
-      'Cache-Control: max-age=0',
+      'Cache-Control': 'max-age=0',
       'Expires': plusTen
     },
     'fresh_for': 0
   },
   {
-    'id': 'vary',
-    'desc': 'Vary caching', 
-    'status': ['200', 'OK'],
+    'id': 'vary_star',
+    'desc': 'Vary: * caching', 
+    'status': 200,
     'res_hdrs': {
-      'Cache-Control: max-age=100',
-      'Vary: *'
+      'Cache-Control': 'max-age=10',
+      'Vary': '*'
     },
     'fresh_for': 0
   },
@@ -93,14 +93,14 @@ this.tests = [
     'id': 'unk_status',
     'desc': 'Unknown Status Code', 
     'status': ['250', 'Whatever'],
-    'res_hdrs': {'Cache-Control': 'max-age=50'},
+    'res_hdrs': {'Cache-Control': 'max-age=10'},
     'fresh_for': 0
   },
   /*
   {
     'id': '',
     'desc': '', 
-    'status': ['200', 'OK'],
+    'status': 200,
     'res_hdrs': {},
     'fresh_for': 0
   },
@@ -115,21 +115,27 @@ this.interpret = function(test) {
   for (i in asset_types) {
     var result;
     var reqs = test[asset_types[i] + "_reqs"];
-    var second_req = reqs[1];
-    var last_fresh_bug;
-    for (b in test.bugs) {
-      var bug = test.bugs[b];
-      if (bug < second_req) {
-        last_fresh_bug = bug;
-      }
+    var second_req;
+    try {
+      second_req = reqs[1].time;
+    } catch(err) {
+      // we assume that if there isn't a second request, the test fails.
+      results[asset_types[i]] = false;
+      continue;
     }
-    var fresh_offset = last_fresh_bug - test.fresh_for;
-    if (fresh_offset > 0) {
+    var bug_count = 0;
+    var first_bug = test.bugs[0].time;
+    for (b in test.bugs) {
+      var bug = test.bugs[b].time;
+      if (bug > (test.fresh_for + first_bug) && bug < second_req) { 
+        bug_count++;
+      }
+    };
+    var result = true;
+    if (bug_count > 0) {
       result = false;
-    } else if (fresh_offset < -tolerance) {
-      result = null;
-    } else {
-      result = true;
+      console.log("*" + test.fresh_for + " " + second_req + " ");
+      console.log(test.bugs);
     }
     results[asset_types[i]] = result;
   };
