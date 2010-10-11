@@ -1,21 +1,26 @@
 #!/usr/bin/env node
 
-var sys = require('sys');
-var http = require('datehttp'); /* FIXME: just for now... */
-var url = require("url");
-var qs = require("querystring");
 var fs = require("fs");
+var http = require('datehttp'); /* FIXME: just for now... */
+var path = require("path");
+var qs = require("querystring");
+var sys = require('sys');
+var url = require("url");
+
+var argv = require('./lib/optimist').argv;
 var Mu = require('./lib/mu');
 
 // how long to continue testing for.
 var tolerance = 2;
 
 // port to listen to 
-var port = parseInt(process.argv.pop());
+var port = parseInt(argv._[0]);
 if (! port || port == NaN) {
-  console.log("Usage: " + process.argv[0] + " listen-port");
+  console.log("Usage: test-browser.js listen-port [state-file]");
   process.exit(1);
 }
+
+state_file = argv._[1];
 
 // load templates
 Mu.templateRoot = './tmpl';
@@ -37,7 +42,38 @@ var interpret = t.interpret;
 console.log("loading " + test_plans.length + " test plans...");
 
 // where ALL test state is stored.
-var state = {};
+var state;
+if (state_file) {
+  try {
+    var state_str = fs.readFileSync(state_file);
+    state = JSON.parse(state_str);
+    console.log("loaded state file.");
+  } catch(e) {
+    if (e.errno == 2) {
+      state = {};
+    } else {
+    console.log("Error reading state file: " + e.message);
+    process.exit(1);
+    }
+  }
+} else {
+  state = {};
+}
+
+function save_state() {
+    if (state_file) {
+      console.log('saving state to file...');
+      var state_str = JSON.stringify(state);
+      fs.writeFileSync(state_file, state_str, 'utf-8');
+      console.log('done.');
+      process.exit(0);
+    }
+}
+
+if (state_file) {
+  process.on('SIGINT', save_state);
+}  
+
 
 
 http.createServer(function (request, response) {
@@ -49,6 +85,7 @@ http.createServer(function (request, response) {
     req_done(request, response);
   });
 }).listen(port);  
+  
   
 function req_done(request, response) {
   var path = url.parse(request.url).pathname;
