@@ -35,24 +35,26 @@ III.
 
 C. Functionality
 
-1. Caches Expires: [future]
-2. Caches Cache-Control: max=age=n
-3. Caches Cache-Control: max-age=n + wait (n-m)
-4. Caches Cache-Control: max-age=n + Age: (n-m)
 5. Caches Expires: [past] + Cache-Control: max-age=[future]
 6. Caches URI with query string + explicit freshness
 7. Caches nominated status codes without explicit freshness
 8. Caches authenticated responses
 9. Caches POST responses for future GETs
 10. Caches PATCH responses
-11. Caches Vary: Accept-Encoding
-12. Caches Vary: User-Agent
-13. Caches Vary: Host
 14. Caches Vary: cookie with same cookie
 15. *Caches on request Cache-Control: max-age=n w/ age <= n
 16. *Caches on request Cache-Control: max-stale...
 17. *Caches partial response
 18. *Combines partial response from cache
+
+needs analysis
+1. Caches Expires: [future]
+2. Caches Cache-Control: max=age=n
+3. Caches Cache-Control: max-age=n + wait (n-m)
+4. Caches Cache-Control: max-age=n + Age: (n-m)
+11. Caches Vary: Accept-Encoding
+12. Caches Vary: User-Agent
+13. Caches Vary: Host
 
 TODO
  - header nomination and private, no-cache
