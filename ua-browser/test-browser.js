@@ -142,7 +142,7 @@ function test_req(request, response, path_segs, session_state) {
   if (tid == "") {
     if (! session_state.tests[0]) {
       // Start testing.
-      return see_other(response, './0/page');      
+      return see_other(response, '/test/' + session_state.id + '/0/page');      
     } else {
       // show results
       response.writeHead(200, {'Content-Type': 'text/html'});
@@ -160,6 +160,7 @@ function test_req(request, response, path_segs, session_state) {
   if (! session_state.tests[tid]) {
     // newly started test
     session_state.tests[tid] = {
+      'session_id': session_state.id,
       'test_id': tid,
       'start': new Date(),
       'bugs': [],
@@ -190,9 +191,11 @@ function test_req(request, response, path_segs, session_state) {
       if (test_state.testing
         && ("cache-control" in request.headers
             || "pragma" in request.headers)
+        && tid == 0
         && ! /Chrome/.test(request.headers['user-agent'])
+        && ! /MSIE/.test(request.headers['user-agent'])
       ) {
-        // evidence of reload. We can't catch this in Chrome
+        // evidence of reload. We can't catch this in Chrome and IE
         // because it sends Cache-Control: max-age on POST requests
         // and subsequent redirects. *sigh*
         clearTimeout(test_state.timeout);
@@ -228,7 +231,8 @@ function test_req(request, response, path_segs, session_state) {
         'tests_complete': tid + 1 >= test_plans.length,
         'req_num': test_state.html_reqs.length,
         'test_plans': test_plans,
-        'test_session': session_state
+        'test_session': session_state,
+        'test_state_json': JSON.stringify(test_state),
       }, response);
       break;
     case 'img':
@@ -242,6 +246,13 @@ function test_req(request, response, path_segs, session_state) {
       break;
     case 'iframe':
       test_asset(request, response, test_state, assets.iframe);
+      break;
+    case 'state':
+      response.writeHead(200, {
+        'Cache-Control': 'max-age=1',
+        'Content-Type': 'application/json'
+      });
+      response.end(JSON.stringify(test_state));
       break;
     default:
       not_found(request, response);
@@ -348,6 +359,7 @@ function gen_id(request) {
   var short_name = qs.parse(request.input_buffer)['short_name'];
   var session_state = {
     'ua': request.headers['user-agent'],
+    'id': id,
     'client_id': short_name || id,
     'tests': []
   };

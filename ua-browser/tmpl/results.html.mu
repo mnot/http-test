@@ -1,7 +1,7 @@
 {{#session_state}}
 <tr>
    <td>{{client_id}}</td>
-   {{#tests}}<td>
+   {{#tests}}<td onclick="fetch_graph({{session_id}}, {{test_id}});">
       {{#results}}
    <span class="html">{{#html}}•{{/html}}{{^html}}x{{/html}}</span>
    <span class="img">{{#img}}•{{/img}}{{^img}}x{{/img}}</span>

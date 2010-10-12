@@ -11,3 +11,5 @@
 {{> result_hdr.html}}
 {{> results.html}}
 </table>
+
+{{> progress_graph.html}}

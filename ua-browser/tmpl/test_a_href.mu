@@ -26,8 +26,6 @@
 {{/testing}}
 </p>
 
-{{> progress_graph.html}}
-
 {{#testing}}
 <img src="img" width="1" height="1" border="1">
 <script src="script" type="text/javascript"></script>
@@ -53,6 +51,11 @@ window.onload = function() {
 }
 </script>
 {{/testing}}
+
+{{> progress_graph.html}}
+<script type="text/javascript">
+  progress_graph({{{test_state_json}}});
+</script>
 
 </body>
 </html>
