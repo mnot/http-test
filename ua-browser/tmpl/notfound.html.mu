@@ -2,6 +2,7 @@
 
 <head>
    <title>Not Found</title>
+   {{> css.html}}
 </head>
 
 <body>

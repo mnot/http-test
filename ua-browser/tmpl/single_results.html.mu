@@ -9,7 +9,9 @@
 
 <table>
 {{> result_hdr.html}}
-{{> results.html}}
+{{#session_state}}
+  {{> results.html}}
+{{/session_state}}
 </table>
 
 {{> progress_graph.html}}

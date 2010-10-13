@@ -1,4 +1,3 @@
-{{#session_state}}
 <tr>
    <td>{{client_id}}</td>
    {{#tests}}<td onclick="fetch_graph({{session_id}}, {{test_id}});">
@@ -11,4 +10,3 @@
       {{/results}}
    </td>{{/tests}}
 </tr>
-{{/session_state}}

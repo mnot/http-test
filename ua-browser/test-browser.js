@@ -123,7 +123,8 @@ function intro_page(request, response) {
     switch (request.method) {
         case 'GET':
             response.writeHead(200, {'Content-Type': 'text/html'});
-            render('welcome.html', {}, response);
+            var state_list = hash_list(state);
+            render('welcome.html', {'state': state_list}, response);
             break;
         case 'POST':
             var id = gen_id(request);
@@ -342,7 +343,7 @@ function render(template, ctx, response) {
   });    
 }
 
-function session_list(s) {
+function hash_list(s) {
   var l = [];
   for (k in s) {
     l.push(s[k]);
