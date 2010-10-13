@@ -123,8 +123,10 @@ function intro_page(request, response) {
     switch (request.method) {
         case 'GET':
             response.writeHead(200, {'Content-Type': 'text/html'});
-            var state_list = hash_list(state);
-            render('welcome.html', {'state': state_list}, response);
+            render('welcome.html', {
+              'state': hash_list(state),
+              'test_plans': test_plans
+            }, response);
             break;
         case 'POST':
             var id = gen_id(request);

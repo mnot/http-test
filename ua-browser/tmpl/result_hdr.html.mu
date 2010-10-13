@@ -1,6 +1,6 @@
 <tr>
    <td>client</td>
    {{#test_plans}}
-      <td>{{id}}</td>
+      <td title="{{desc}}">{{id}}</td>
    {{/test_plans}}
 </tr>
