@@ -11,7 +11,7 @@ var argv = require('./lib/optimist').argv;
 var Mu = require('./lib/Mu');
 
 // how long to continue testing for.
-var tolerance = 2;
+var tolerance = 3;
 
 // port to listen to 
 var port = parseInt(argv._[0]);
