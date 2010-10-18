@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require("fs");
-var http = require('datehttp'); /* FIXME: just for now... */
+var http = require('./lib/datehttp'); /* FIXME: just for now... */
 var path = require("path");
 var qs = require("querystring");
 var sys = require('sys');
